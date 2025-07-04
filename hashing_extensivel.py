@@ -65,7 +65,7 @@ class HashingExtensivel:
         else:
             print(f"Bucket {ref_bucket} cheio (cont = {bucket.cont}). Chamando _dividir_bucket.")
             self._dividir_bucket(ref_bucket, bucket)
-            self.op_inserir(chave)  # Reinsere a chave após divisão
+            self.op_inserir(chave)
 
     def _dividir_bucket(self, ref_bucket, bucket):
         print(f"\n===> Iniciando divisão do bucket {ref_bucket}")
@@ -79,7 +79,7 @@ class HashingExtensivel:
         novo_bucket = Bucket(profundidade_local=nova_profundidade)
         bucket.profundidade_local = nova_profundidade
 
-        rrn_novo_bucket = len(set(self.diretorio.refs))  # novo RRN único
+        rrn_novo_bucket = len(set(self.diretorio.refs))
 
         for i in range(len(self.diretorio.refs)):
             endereco = i >> (self.diretorio.profundidade_global - nova_profundidade)

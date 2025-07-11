@@ -1,6 +1,6 @@
 # Hashing Extensível
 
-Trabalho da disciplina de Organização e Recuperação de Dados (), implementa uma estrutura de **Hashing Extensível** em Python, conforme a especificação previa.
+Trabalho da disciplina de Organização e Recuperação de Dados (9895/31), implementa uma estrutura de **Hashing Extensível** em Python, conforme a especificação previa.
 
 ## 📚 O que é Hashing Extensível?
 
@@ -22,7 +22,7 @@ O hashing extensível é uma técnica de indexação dinâmica que cresce ou red
 
 ---
 
-## ▶️ Como executar
+## ▶ Como executar
 
 ### 1️⃣ Executar operações de um arquivo:
 

@@ -40,7 +40,6 @@ class HashingExtensivel:
             f.seek(rrn * self.tamanho_bucket)
             f.write(bucket.to_bytes(self.TAM_MAX_BUCKET))
 
-
     def op_buscar(self, chave):
         endereco = gerar_endereco(chave, self.diretorio.profundidade_global)
         ref_bucket = self.diretorio.obter_referencia(endereco)
@@ -72,7 +71,7 @@ class HashingExtensivel:
         novo_bucket = Bucket(profundidade_local=nova_profundidade)
         bucket.profundidade_local = nova_profundidade
 
-        rrn_novo_bucket = self._buscar_proximo_rrn()
+        rrn_novo_bucket = self._buscar_proximo_rrn()        # Uso da função para obter o próximo RRN, tinha esquecido de referenciar, ela já existia
 
         for i in range(len(self.diretorio.refs)):
             if self.diretorio.refs[i] == ref_bucket:
@@ -102,7 +101,7 @@ class HashingExtensivel:
             tamanho_atual = f.tell()
         return tamanho_atual // self.tamanho_bucket
 
-    def dobrar_diretorio(self):
+    def dobrar_diretorio(self):         # Nova função para dobrar o diretório, conforme foi comentado
         novas_refs = []
         for ref in self.diretorio.refs:
             novas_refs.append(ref)
@@ -110,8 +109,6 @@ class HashingExtensivel:
         self.diretorio.refs = novas_refs
         self.diretorio.profundidade_global += 1
         self._salvar_diretorio()
-
-
 
     def op_remover(self, chave):
         achou, ref_bucket, bucket = self.op_buscar(chave)

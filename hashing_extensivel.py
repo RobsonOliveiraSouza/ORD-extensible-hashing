@@ -71,7 +71,7 @@ class HashingExtensivel:
         novo_bucket = Bucket(profundidade_local=nova_profundidade)
         bucket.profundidade_local = nova_profundidade
 
-        rrn_novo_bucket = self._buscar_proximo_rrn()        # Uso da função para obter o próximo RRN, tinha esquecido de referenciar, ela já existia
+        rrn_novo_bucket = self._buscar_proximo_rrn()        # Uso da função '_buscar_proximo_rrn' para obter o próximo RRN, tinhamos esquecido de referenciar ela já existia
 
         for i in range(len(self.diretorio.refs)):
             if self.diretorio.refs[i] == ref_bucket:

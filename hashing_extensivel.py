@@ -9,11 +9,11 @@ from util import gerar_endereco
 # Vitor Fernando Regis
 
 class HashingExtensivel:
-    def __init__(self, tam_max_buck=3, arq_diretorio='diretorio.dat', arq_buckets='buckets.dat'):
+    def __init__(self, tam_max_buck=5, arq_diretorio='diretorio.dat', arq_buckets='buckets.dat'):
         self.TAM_MAX_BUCKET = tam_max_buck
         self.arq_diretorio = arq_diretorio
         self.arq_buckets = arq_buckets
-        self.tamanho_bucket = 5 * 4
+        self.tamanho_bucket = tam_max_buck * 4 + 8
 
         if os.path.exists(self.arq_diretorio):
             self.diretorio = Diretorio.carregar_de_arquivo(self.arq_diretorio)
@@ -33,12 +33,12 @@ class HashingExtensivel:
         with open(self.arq_buckets, 'rb') as f:
             f.seek(rrn * self.tamanho_bucket)
             data = f.read(self.tamanho_bucket)
-        return Bucket.from_bytes(data, self.TAM_MAX_BUCKET)  # <- corrigido
+        return Bucket.from_bytes(data, self.TAM_MAX_BUCKET) 
 
     def _escrever_bucket(self, bucket, rrn):
         with open(self.arq_buckets, 'r+b') as f:
             f.seek(rrn * self.tamanho_bucket)
-            f.write(bucket.to_bytes(self.TAM_MAX_BUCKET))  # <- corrigido
+            f.write(bucket.to_bytes(self.TAM_MAX_BUCKET))
 
 
     def op_buscar(self, chave):
@@ -57,58 +57,44 @@ class HashingExtensivel:
         return True
 
     def inserir_chave_bucket(self, chave, ref_bucket, bucket):
-        print(f"Tentando inserir chave {chave} no bucket {ref_bucket} (cont = {bucket.cont})")
         if bucket.cont < self.TAM_MAX_BUCKET:
-            print(f"Inserindo no bucket {ref_bucket} diretamente.")
             bucket.inserir(chave, self.TAM_MAX_BUCKET)
             self._escrever_bucket(bucket, ref_bucket)
         else:
-            print(f"Bucket {ref_bucket} cheio (cont = {bucket.cont}). Chamando _dividir_bucket.")
             self._dividir_bucket(ref_bucket, bucket)
             self.op_inserir(chave)
 
     def _dividir_bucket(self, ref_bucket, bucket):
-        print(f"\n===> Iniciando divisão do bucket {ref_bucket}")
-        print(f"Bucket antes da divisão: {bucket}")
-
         if bucket.profundidade_local == self.diretorio.profundidade_global:
-            print("Profundidade local == global, dobrando diretório.")
             self.dobrar_diretorio()
 
         nova_profundidade = bucket.profundidade_local + 1
         novo_bucket = Bucket(profundidade_local=nova_profundidade)
         bucket.profundidade_local = nova_profundidade
 
-        rrn_novo_bucket = len(set(self.diretorio.refs))
+        rrn_novo_bucket = self._buscar_proximo_rrn()
 
         for i in range(len(self.diretorio.refs)):
-            endereco = i >> (self.diretorio.profundidade_global - nova_profundidade)
-            if endereco & 1:
-                if self.diretorio.refs[i] == ref_bucket:
+            if self.diretorio.refs[i] == ref_bucket:
+                endereco_i = i
+                bit = (endereco_i >> (self.diretorio.profundidade_global - nova_profundidade)) & 1
+                if bit == 1:
                     self.diretorio.refs[i] = rrn_novo_bucket
-
-        print(f"RRN novo bucket: {rrn_novo_bucket}")
-        print(f"Redistribuindo chaves entre bucket {ref_bucket} e {rrn_novo_bucket}")
 
         chaves_antigas = bucket.chaves[:]
         bucket.chaves.clear()
         novo_bucket.chaves.clear()
 
         for chave in chaves_antigas:
-            endereco = gerar_endereco(chave, nova_profundidade)
+            endereco = gerar_endereco(chave, self.diretorio.profundidade_global)
             if endereco & 1:
-                print(f"Movendo chave {chave} para novo bucket")
                 novo_bucket.inserir(chave, self.TAM_MAX_BUCKET)
             else:
-                print(f"Retendo chave {chave} no bucket original")
                 bucket.inserir(chave, self.TAM_MAX_BUCKET)
 
         self._escrever_bucket(bucket, ref_bucket)
         self._escrever_bucket(novo_bucket, rrn_novo_bucket)
         self._salvar_diretorio()
-
-        print(f"Bucket {ref_bucket} após divisão: {bucket}")
-        print(f"Bucket {rrn_novo_bucket} criado: {novo_bucket}\n")
 
     def _buscar_proximo_rrn(self):
         with open(self.arq_buckets, 'rb') as f:
@@ -117,12 +103,14 @@ class HashingExtensivel:
         return tamanho_atual // self.tamanho_bucket
 
     def dobrar_diretorio(self):
-        print(f"Dobrando diretório. Profundidade global atual: {self.diretorio.profundidade_global}")
-        self.diretorio.refs += self.diretorio.refs
+        novas_refs = []
+        for ref in self.diretorio.refs:
+            novas_refs.append(ref)
+            novas_refs.append(ref)
+        self.diretorio.refs = novas_refs
         self.diretorio.profundidade_global += 1
-        print(f"Nova profundidade global: {self.diretorio.profundidade_global}")
-        print(f"Referências do diretório: {self.diretorio.refs}")
         self._salvar_diretorio()
+
 
 
     def op_remover(self, chave):
@@ -177,7 +165,7 @@ class HashingExtensivel:
             return False
         tamanho = 2 ** self.diretorio.profundidade_global
         diminuir = True
-        for i in range(0, tamanho, 2):
+        for i in range(0, tamanho - 1, 2):
             if self.diretorio.refs[i] != self.diretorio.refs[i + 1]:
                 diminuir = False
                 break

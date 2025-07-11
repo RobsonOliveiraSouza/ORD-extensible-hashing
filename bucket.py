@@ -4,6 +4,7 @@ class Bucket:
     def __init__(self, profundidade_local, chaves=None):
         self.profundidade_local = profundidade_local
         self.chaves = chaves or []
+        
     @property
     def cont(self):
         return len(self.chaves)

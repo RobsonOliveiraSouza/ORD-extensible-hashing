@@ -1,4 +1,6 @@
 import sys
+import os
+
 from hashing_extensivel import HashingExtensivel
 
 def executar_operacoes(nome_arquivo):
@@ -45,14 +47,26 @@ def imprimir_diretorio():
 
 def imprimir_buckets():
     hashing = HashingExtensivel()
-    buckets_lidos = set()
+    bucket_usados = set(hashing.diretorio.refs)
+
     print("\n--- Buckets ---")
-    for i, ref in enumerate(hashing.diretorio.refs):
-        if ref in buckets_lidos:
-            continue
-        bucket = hashing._ler_bucket(ref)
-        print(f"Bucket {ref}: profundidade = {bucket.profundidade_local}, chaves = {bucket.chaves}")
-        buckets_lidos.add(ref)
+    try:
+        with open(hashing.arq_buckets, 'rb') as f:
+            f.seek(0, os.SEEK_END)
+            total_buckets = f.tell() // hashing.tamanho_bucket
+
+        for rrn in range(total_buckets):
+            bucket = hashing._ler_bucket(rrn)
+            if rrn in bucket_usados:
+                chaves_formatadas = bucket.chaves + [-1] * (hashing.TAM_MAX_BUCKET - len(bucket.chaves))
+                print(f"Bucket {rrn} (Prof = {bucket.profundidade_local}):")
+                print(f"ContaChaves = {bucket.cont}")
+                print(f"Chaves = {chaves_formatadas}")
+            else:
+                print(f"Bucket {rrn} --> Removido")
+    except FileNotFoundError:
+        print("Arquivo de buckets não encontrado.")
+
 
 def main():
     if len(sys.argv) < 2:

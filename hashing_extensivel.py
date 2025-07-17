@@ -1,12 +1,12 @@
 import os
-import struct
+
 from diretorio import Diretorio
 from bucket import Bucket
 from util import gerar_endereco
 
-# Rafael Monteiro Zancanaro
-# Robson Oliveira de Souza
-# Vitor Fernando Regis
+# Rafael Monteiro Zancanaro     RA: 124540
+# Robson Oliveira de Souza      RA: 124277
+# Vitor Fernando Regis          RA: 123612
 
 class HashingExtensivel:
     def __init__(self, tam_max_buck=5, arq_diretorio='diretorio.dat', arq_buckets='buckets.dat'):
@@ -104,7 +104,7 @@ class HashingExtensivel:
     def dobrar_diretorio(self):         # Nova função para dobrar o diretório, conforme foi comentado
         novas_refs = []
         for ref in self.diretorio.refs:
-            novas_refs.append(ref)
+            novas_refs.append(ref)      # Agora ela dobra a lista de referências do diretório (Antes estava apenas duplicando a referência do bucket)
             novas_refs.append(ref)
         self.diretorio.refs = novas_refs
         self.diretorio.profundidade_global += 1

@@ -3,9 +3,11 @@ import os
 
 from hashing_extensivel import HashingExtensivel
 
-# Rafael Monteiro Zancanaro
-# Robson Oliveira de Souza
-# Vitor Fernando Regis
+# Rafael Monteiro Zancanaro     RA: 124540
+# Robson Oliveira de Souza      RA: 124277
+# Vitor Fernando Regis          RA: 123612
+
+#  ---  2º Trabnalho prático - ORD: Hashing Extensivel  --- 
 
 def executar_operacoes(nome_arquivo):
     hashing = HashingExtensivel()
